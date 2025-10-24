@@ -1,0 +1,48 @@
+// --- Variables to control the conveyor's dimensions ---
+conveyor_length = 500; // Overall length of the conveyor in mm
+roller_spacing = 50;  // Spacing between the center of each roller
+roller_diameter = 20; // Diameter of the conveyor rollers
+roller_length = 200; // Length of the roller cylinders
+frame_width = 250; // Width of the conveyor frame
+frame_thickness = 5; // Thickness of the frame material
+
+// --- Modules for individual components ---
+
+// A single roller
+module roller() {
+  cylinder(h=roller_length, d=roller_diameter, center=true);
+}
+
+// A single frame rail with cutouts for rollers
+module frame_rail() {
+  difference() {
+    // The main rail profile
+    cube([conveyor_length, frame_thickness, frame_width]);
+    
+    // Create cutouts for the rollers
+    for (i = [0 : roller_spacing : conveyor_length - roller_spacing]) {
+      translate([i + roller_spacing/2, frame_thickness/2, frame_width/2])
+      rotate([0, 90, 0])
+      cylinder(h=frame_thickness + 1, d=roller_diameter + 1, center=true);
+    }
+  }
+}
+
+// The complete roller conveyor assembly
+module roller_conveyor() {
+  // Main frame
+  translate([0, 0, frame_width/2])
+  frame_rail();
+  
+  translate([0, 0, -frame_width/2])
+  frame_rail();
+
+  // Rollers
+  for (i = [0 : roller_spacing : conveyor_length - roller_spacing]) {
+    translate([i + roller_spacing/2, 0, 0])
+    roller();
+  }
+}
+
+// --- Render the final model ---
+roller_conveyor();
